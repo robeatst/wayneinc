@@ -1,48 +1,38 @@
-// index.js
+// Загружаем переменные окружения из .env
+import 'dotenv/config';
 import express from 'express';
 import { Client, GatewayIntentBits } from 'discord.js';
-import 'dotenv/config';
 
-// ===================== EXPRESS SERVER =====================
+// --- Express ---
 const app = express();
-const PORT = process.env.PORT || 8000;
+const port = process.env.PORT || 8000;
 
 app.get('/', (req, res) => {
-  res.send('✅ Bot is running!');
+  res.send('Bot is running!');
 });
 
-app.listen(PORT, () => {
-  console.log(`Express server listening on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`✅ Express server listening on port ${port}`);
 });
 
-// ===================== DISCORD BOT =====================
-const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
+// --- Discord Bot ---
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+});
 
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`✅ Бот ${client.user.tag} запущен!`);
 });
 
-// Логин через токен из Koyeb Secret
+// Логин бота через токен из Environment Variable
 const token = process.env.DISCORD_TOKEN;
 
 if (!token) {
-  console.error('❌ DISCORD_TOKEN не найден!');
+  console.error('❌ DISCORD_TOKEN не найден');
   process.exit(1);
 }
 
 client.login(token).catch(err => {
-  console.error('❌ Ошибка при логине бота:', err);
+  console.error('Ошибка логина бота:', err);
   process.exit(1);
 });
-
-// ===================== ОБРАБОТКА КОМАНД =====================
-// Пример простой команды: если нужно подключить команды из папки, можно дописать здесь
-// import fs from 'fs';
-// import path from 'path';
-// client.commands = new Map();
-// const commandsPath = path.join(process.cwd(), 'commands');
-// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-// for (const file of commandFiles) {
-//     const command = await import(`./commands/${file}`);
-//     if (command.data?.name) client.commands.set(command.data.name, command);
-// }
