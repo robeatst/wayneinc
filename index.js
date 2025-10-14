@@ -1,45 +1,48 @@
+// index.js
+import express from 'express';
+import { Client, GatewayIntentBits } from 'discord.js';
 import 'dotenv/config';
-import { Client, GatewayIntentBits, Collection } from 'discord.js';
-import fs from 'fs';
-import path from 'path';
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-client.commands = new Collection();
+// ===================== EXPRESS SERVER =====================
+const app = express();
+const PORT = process.env.PORT || 8000;
 
-const commandsPath = path.join(process.cwd(), 'commands');
-const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+app.get('/', (req, res) => {
+  res.send('✅ Bot is running!');
+});
 
-for (const file of commandFiles) {
-  const { data, execute } = await import(`./commands/${file}`);
-  client.commands.set(data.name, { data, execute });
-}
+app.listen(PORT, () => {
+  console.log(`Express server listening on port ${PORT}`);
+});
+
+// ===================== DISCORD BOT =====================
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages] });
 
 client.once('ready', () => {
   console.log(`✅ Бот ${client.user.tag} запущен!`);
 });
 
-client.on('interactionCreate', async interaction => {
-  if (!interaction.isChatInputCommand()) return;
-  const command = client.commands.get(interaction.commandName);
-  if (!command) return;
+// Логин через токен из Koyeb Secret
+const token = process.env.DISCORD_TOKEN;
 
-  try {
-    await command.execute(interaction);
-  } catch (error) {
-    console.error(error);
-    await interaction.reply({ content: 'Ошибка при выполнении команды!', ephemeral: true });
-  }
+if (!token) {
+  console.error('❌ DISCORD_TOKEN не найден!');
+  process.exit(1);
+}
+
+client.login(token).catch(err => {
+  console.error('❌ Ошибка при логине бота:', err);
+  process.exit(1);
 });
 
-console.log('DISCORD_TOKEN:', process.env.DISCORD_TOKEN ? '✅ найден' : '❌ не найден');
-client.login(process.env.DISCORD_TOKEN);
-
-import express from 'express';
-const app = express();
-const PORT = process.env.PORT || 8000;
-
-// Минимальный health check
-app.get('/', (req, res) => res.send('OK'));
-
-// Запуск сервера для Koyeb
-app.listen(PORT, () => console.log(`Health check server running on port ${PORT}`));
+// ===================== ОБРАБОТКА КОМАНД =====================
+// Пример простой команды: если нужно подключить команды из папки, можно дописать здесь
+// import fs from 'fs';
+// import path from 'path';
+// client.commands = new Map();
+// const commandsPath = path.join(process.cwd(), 'commands');
+// const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+// for (const file of commandFiles) {
+//     const command = await import(`./commands/${file}`);
+//     if (command.data?.name) client.commands.set(command.data.name, command);
+// }
