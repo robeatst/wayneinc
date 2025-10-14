@@ -1,8 +1,22 @@
 import 'dotenv/config';
+import express from 'express';
 import { Client, GatewayIntentBits, Collection, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import fs from 'fs';
 import path from 'path';
 
+// ===== EXPRESS SERVER (для Koyeb health check) =====
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('✅ Сервис запущен!');
+});
+
+const PORT = 8000;
+app.listen(PORT, () => {
+  console.log(`✅ Express server listening on port ${PORT}`);
+});
+
+// ===== DISCORD BOT =====
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
