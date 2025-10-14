@@ -33,3 +33,13 @@ client.on('interactionCreate', async interaction => {
 
 console.log('DISCORD_TOKEN:', process.env.DISCORD_TOKEN ? '✅ найден' : '❌ не найден');
 client.login(process.env.DISCORD_TOKEN);
+
+import express from 'express';
+const app = express();
+const PORT = process.env.PORT || 8000;
+
+// Минимальный health check
+app.get('/', (req, res) => res.send('OK'));
+
+// Запуск сервера для Koyeb
+app.listen(PORT, () => console.log(`Health check server running on port ${PORT}`));
