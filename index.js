@@ -31,4 +31,5 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
+console.log('DISCORD_TOKEN:', process.env.DISCORD_TOKEN ? '✅ найден' : '❌ не найден');
 client.login(process.env.DISCORD_TOKEN);
