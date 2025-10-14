@@ -1,10 +1,8 @@
-import { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
-export const data = new SlashCommandBuilder()
-  .setName('submit')
-  .setDescription('Открывает форму отправки контракта');
+export const data = { name: 'submit' };
 
-export async function execute(interaction) {
+export async function execute(message, args) {
   const row = new ActionRowBuilder().addComponents(
     new ButtonBuilder()
       .setCustomId('open_modal')
@@ -12,5 +10,5 @@ export async function execute(interaction) {
       .setStyle(ButtonStyle.Primary)
   );
 
-  await interaction.reply({ content: 'Нажмите кнопку, чтобы открыть форму:', components: [row], ephemeral: true });
+  await message.reply({ content: 'Нажмите кнопку, чтобы открыть форму:', components: [row] });
 }
