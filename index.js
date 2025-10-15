@@ -1,22 +1,27 @@
 import 'dotenv/config';
-import express from 'express';
-import { Client, GatewayIntentBits, Collection, Events, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { 
+  Client, 
+  GatewayIntentBits, 
+  Collection, 
+  Events, 
+  ModalBuilder, 
+  TextInputBuilder, 
+  TextInputStyle, 
+  ActionRowBuilder, 
+  ButtonBuilder, 
+  ButtonStyle 
+} from 'discord.js';
 import fs from 'fs';
 import path from 'path';
+import express from 'express';
 
-// ===== EXPRESS SERVER (для Koyeb health check) =====
+// ==== EXPRESS для Koyeb health check ====
 const app = express();
+const PORT = process.env.PORT || 8000;
+app.get('/', (_, res) => res.send('Bot is running!'));
+app.listen(PORT, () => console.log(`✅ Express server listening on port ${PORT}`));
 
-app.get('/', (req, res) => {
-  res.send('✅ Сервис запущен!');
-});
-
-const PORT = 8000;
-app.listen(PORT, () => {
-  console.log(`✅ Express server listening on port ${PORT}`);
-});
-
-// ===== DISCORD BOT =====
+// ==== DISCORD BOT ====
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -37,7 +42,7 @@ for (const file of commandFiles) {
 }
 
 // Логин
-client.once('clientReady', () => {
+client.once('ready', () => {
   console.log(`✅ Бот ${client.user.tag} запущен!`);
 });
 
@@ -70,19 +75,22 @@ client.on(Events.InteractionCreate, async interaction => {
 
     const typeInput = new TextInputBuilder()
       .setCustomId('contractType')
-      .setLabel('Тип контракта (Дары моря, Металлургия, Товары со склада, Ателье)')
+      .setLabel('Тип контракта')
+      .setPlaceholder('Дары моря / Металлургия / Товары со склада / Ателье')
       .setStyle(TextInputStyle.Short)
       .setRequired(true);
 
     const screenshotInput = new TextInputBuilder()
       .setCustomId('screenshot')
       .setLabel('Ссылка на скриншот')
+      .setPlaceholder('https://...')
       .setStyle(TextInputStyle.Short)
       .setRequired(true);
 
     const activatedInput = new TextInputBuilder()
       .setCustomId('activated')
-      .setLabel('Активировал контракт? (Да/Нет)')
+      .setLabel('Активировал контракт?')
+      .setPlaceholder('Да / Нет')
       .setStyle(TextInputStyle.Short)
       .setRequired(true);
 
@@ -118,7 +126,11 @@ client.on(Events.InteractionCreate, async interaction => {
 
     const channel = await client.channels.fetch(channelId);
 
-    await channel.send(`**${interaction.user}**\nСкриншот: ${screenshot}\n${activated === 'Да' ? 'Активировал контракт ✅' : 'Не активировал контракт ❌'}`);
+    await channel.send(
+      `**${interaction.user}**\n` +
+      `Скриншот: ${screenshot}\n` +
+      `${activated.toLowerCase() === 'да' ? 'Активировал контракт ✅' : 'Не активировал контракт ❌'}`
+    );
 
     await interaction.reply({ content: 'Контракт успешно отправлен!', ephemeral: true });
   }
