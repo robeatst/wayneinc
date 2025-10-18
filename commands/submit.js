@@ -1,6 +1,15 @@
-const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder,
-        ActionRowBuilder, StringSelectMenuBuilder,
-        ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+import {
+  Client,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  SlashCommandBuilder,
+  ActionRowBuilder,
+  StringSelectMenuBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle
+} from 'discord.js';
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const GUILD_ID = 'YOUR_GUILD_ID'; // замените на ID вашего сервера
